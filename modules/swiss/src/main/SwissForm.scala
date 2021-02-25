@@ -32,7 +32,7 @@ final class SwissForm(implicit mode: Mode) {
         "position"          -> optional(lila.common.Form.fen.playableStrict),
         "chatFor"           -> optional(numberIn(chatForChoices.map(_._1))),
         "roundInterval"     -> optional(numberIn(roundIntervals)),
-        "password"          -> optional(cleanNonEmptyText),
+        "swiss_password"          -> optional(cleanNonEmptyText),
         "conditions"        -> SwissCondition.DataForm.all,
         "forbiddenPairings" -> optional(cleanNonEmptyText)
       )(SwissData.apply)(SwissData.unapply)
