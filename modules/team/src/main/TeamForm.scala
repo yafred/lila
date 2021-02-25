@@ -15,10 +15,10 @@ final private[team] class TeamForm(
     extends lila.hub.CaptchedForm {
 
   private object Fields {
-    val name     = "name"     -> cleanText(minLength = 3, maxLength = 60)
-    val location = "location" -> optional(cleanText(minLength = 3, maxLength = 80))
-    val password = "password" -> optional(cleanText(maxLength = 60))
-    def passwordCheck(team: Team) = "password" -> optional(text).verifying(
+    val name     = "name"          -> cleanText(minLength = 3, maxLength = 60)
+    val location = "location"      -> optional(cleanText(minLength = 3, maxLength = 80))
+    val password = "team_password" -> optional(cleanText(maxLength = 60))
+    def passwordCheck(team: Team) = "team_password" -> optional(text).verifying(
       "team:incorrectTeamPassword",
       pw => team.password.fold(true)(_ == pw.??(_.trim))
     )

@@ -80,19 +80,19 @@ final class TournamentForm {
           if (lila.security.Granter(_.ManageTournament)(user)) number
           else numberIn(minuteChoices)
         },
-        "waitMinutes"      -> optional(numberIn(waitMinuteChoices)),
-        "startDate"        -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
-        "variant"          -> optional(text.verifying(v => guessVariant(v).isDefined)),
-        "position"         -> optional(lila.common.Form.fen.playableStrict),
-        "mode"             -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
-        "rated"            -> optional(boolean),
-        "password"         -> optional(cleanNonEmptyText),
-        "conditions"       -> Condition.DataForm.all(leaderTeams),
-        "teamBattleByTeam" -> optional(nonEmptyText.verifying(id => leaderTeams.exists(_.id == id))),
-        "berserkable"      -> optional(boolean),
-        "streakable"       -> optional(boolean),
-        "description"      -> optional(cleanNonEmptyText),
-        "hasChat"          -> optional(boolean)
+        "waitMinutes"         -> optional(numberIn(waitMinuteChoices)),
+        "startDate"           -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
+        "variant"             -> optional(text.verifying(v => guessVariant(v).isDefined)),
+        "position"            -> optional(lila.common.Form.fen.playableStrict),
+        "mode"                -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
+        "rated"               -> optional(boolean),
+        "tournament_password" -> optional(cleanNonEmptyText),
+        "conditions"          -> Condition.DataForm.all(leaderTeams),
+        "teamBattleByTeam"    -> optional(nonEmptyText.verifying(id => leaderTeams.exists(_.id == id))),
+        "berserkable"         -> optional(boolean),
+        "streakable"          -> optional(boolean),
+        "description"         -> optional(cleanNonEmptyText),
+        "hasChat"             -> optional(boolean)
       )(TournamentSetup.apply)(TournamentSetup.unapply)
         .verifying("Invalid clock", _.validClock)
         .verifying("15s variant games cannot be rated", _.validRatedUltraBulletVariant)
