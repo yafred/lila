@@ -4,7 +4,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{ RequestHeader, Result }
 
 import lila.app.{ *, given }
-import lila.challenge.{ Challenge as ChallengeModel, Direction, challengePref }
+import lila.challenge.{ Challenge as ChallengeModel, Direction, ChallengePref, challengePref }
 import lila.core.id.ChallengeId
 import lila.core.net.Bearer
 import lila.core.socket.SocketVersion
@@ -37,8 +37,14 @@ final class Challenge(env: Env) extends LilaController(env):
     challengePrefApi
       .remove(me.username.toString())
       .inject(Redirect(routes.Challenge.showPreference).flashSuccess)
-
   }
+
+  def challengeFriend(username: UserStr) = Open:
+    challengePrefApi
+      .find(username.toString)
+      .map(c =>
+        Redirect(s"${routes.Lobby.home}?user=${username.toString}${ChallengePref.asEncodedUrlAttr(c)}#friend")
+      )
 
   def all = Auth { ctx ?=> me ?=>
     XhrOrRedirectHome:
