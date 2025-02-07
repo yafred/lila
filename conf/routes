@@ -504,6 +504,7 @@ POST  /challenge/rematch-of/$id<\w{8}> controllers.Challenge.offerRematchForGame
 POST  /challenge/update-preference     controllers.Challenge.updatePreference
 GET   /challenge/delete-preference     controllers.Challenge.deletePreference
 GET   /challenge/preference            controllers.Challenge.showPreference
+GET   /challenge/friend/:user          controllers.Challenge.challengeFriend(user: UserStr)
 
 # Notify
 GET  /notify                           controllers.Notify.recent(page: Int ?= 1)
