@@ -18,6 +18,7 @@ const formatStringRe = /%(?:[\d]\$)?s/;
 let dicts: Map<string, Dict> = new Map();
 let locales: string[];
 let cats: string[];
+let uniqueUsedKeys: string[];
 
 export function i18n(): Promise<any> {
   if (!env.begin('i18n')) return Promise.resolve();
@@ -39,6 +40,7 @@ export function i18n(): Promise<any> {
       ).map(list => list.map(x => x.split('.')[0]));
       await Promise.allSettled(cats.map(async cat => fs.promises.mkdir(join(env.i18nDestDir, cat))));
       await compileTypings();
+      await listUsedKeys();
       await compileJavascripts();
       await i18nManifest();
     },
@@ -88,6 +90,50 @@ async function compileTypings(): Promise<void> {
   }
 }
 
+async function listUsedKeys(): Promise<void> {
+  dicts = new Map(
+    zip(
+      cats,
+      await Promise.all(
+        cats.map(d => fs.promises.readFile(join(env.i18nSrcDir, `${d}.xml`), 'utf8').then(parseXml)),
+      ),
+    ),
+  );
+  env.log(`dicts ${dicts.size}`, 'i18n');
+
+  let allKeys: string[] = [];
+  [...dicts].map(([cat, dict]) => {
+    env.log(`dicts ${cat} ${dict.size}`, 'i18n');
+    [...dict.keys()].map(k => allKeys.push(cat + '.' + k));
+  });
+
+  env.log(`allKeys ${allKeys.length}`, 'i18n');
+
+  let usedKeys: string[] = [];
+  const pattern = `${env.uiDir}/**/*.ts`;
+
+  const tsFiles = await fg(`${pattern}`);
+  tsFiles.forEach((tsFile) => {
+    const content = fs.readFileSync(tsFile, "utf-8");
+    allKeys.forEach((key) => {
+      if (content.includes(key)) {
+        usedKeys.push(key)
+      }
+    });
+  });
+
+  uniqueUsedKeys = [...new Set(usedKeys)];
+
+  env.log(`usedKeys ${uniqueUsedKeys.length}`, 'i18n');
+
+  await fs.promises.writeFile(
+    join(env.typesDir, 'lichess', `i18n.js.keys`),
+    [...uniqueUsedKeys].map(k => `${k}\n`)
+  )
+}
+
+
+
 function compileJavascripts(): Promise<any> {
   return Promise.all(
     cats.map(async cat => {
@@ -127,6 +173,7 @@ async function writeJavascript(cat: string, locale?: string, xstat: fs.Stats | f
     jsInit +
     `let i=window.i18n.${cat}={};` +
     [...translations]
+      .filter(([k, _]) => uniqueUsedKeys.includes(cat + '.' + k)) 
       .map(
         ([k, v]) =>
           `i['${k}']=` +
