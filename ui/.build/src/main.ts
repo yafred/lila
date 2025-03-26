@@ -14,6 +14,7 @@ const args: Record<string, string> = {
   '--i18n': '',
   '--no-color': '',
   '--no-time': '',
+  '--no-i18n-pruning': '',
   '--no-context': '',
   '--no-corepack': '',
   '--help': 'h',
@@ -95,6 +96,7 @@ if (['--tsc', '--sass', '--esbuild', '--i18n'].filter(x => argv.includes(x)).len
 env.logTime = !argv.includes('--no-time');
 env.logCtx = !argv.includes('--no-context');
 env.logColor = !argv.includes('--no-color');
+env.i18nJsPruning = !argv.includes('--no-i18n-js-pruning');
 env.watch = argv.includes('--watch') || oneDashArgs.includes('w');
 env.prod = argv.includes('--prod') || oneDashArgs.includes('p');
 env.debug = argv.includes('--debug') || oneDashArgs.includes('d');

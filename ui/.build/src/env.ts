@@ -35,6 +35,7 @@ export const env = new (class {
   logTime = true;
   logCtx = true;
   logColor = true;
+  i18nJsPruning = true;
   remoteLog: string | boolean = false;
   startTime: number | undefined;
 

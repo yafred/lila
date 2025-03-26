@@ -18,7 +18,7 @@ const formatStringRe = /%(?:[\d]\$)?s/;
 let dicts: Map<string, Dict> = new Map();
 let locales: string[];
 let cats: string[];
-let uniqueUsedKeys: string[];
+let keysForJavascripts: string[];
 
 export function i18n(): Promise<any> {
   if (!env.begin('i18n')) return Promise.resolve();
@@ -40,7 +40,7 @@ export function i18n(): Promise<any> {
       ).map(list => list.map(x => x.split('.')[0]));
       await Promise.allSettled(cats.map(async cat => fs.promises.mkdir(join(env.i18nDestDir, cat))));
       await compileTypings();
-      await listUsedKeys();
+      await listKeysForJavascripts();
       await compileJavascripts();
       await i18nManifest();
     },
@@ -90,7 +90,7 @@ async function compileTypings(): Promise<void> {
   }
 }
 
-async function listUsedKeys(): Promise<void> {
+async function listKeysForJavascripts(): Promise<void> {
   dicts = new Map(
     zip(
       cats,
@@ -99,15 +99,13 @@ async function listUsedKeys(): Promise<void> {
       ),
     ),
   );
-  env.log(`dicts ${dicts.size}`, 'i18n');
 
   let allKeys: string[] = [];
   [...dicts].map(([cat, dict]) => {
-    env.log(`dicts ${cat} ${dict.size}`, 'i18n');
     [...dict.keys()].map(k => allKeys.push(cat + '.' + k));
   });
 
-  env.log(`allKeys ${allKeys.length}`, 'i18n');
+  env.log(`${allKeys.length} translation keys`, 'i18n');
 
   let usedKeys: string[] = [];
   const pattern = `${env.uiDir}/**/*.ts`;
@@ -122,14 +120,9 @@ async function listUsedKeys(): Promise<void> {
     });
   });
 
-  uniqueUsedKeys = [...new Set(usedKeys)];
+  keysForJavascripts = [...new Set(usedKeys)];
 
-  env.log(`usedKeys ${uniqueUsedKeys.length}`, 'i18n');
-
-  await fs.promises.writeFile(
-    join(env.typesDir, 'lichess', `i18n.js.keys`),
-    [...uniqueUsedKeys].map(k => `${k}\n`)
-  )
+  env.log(`${keysForJavascripts.length} translation keys after pruning`, 'i18n');
 }
 
 
@@ -173,7 +166,7 @@ async function writeJavascript(cat: string, locale?: string, xstat: fs.Stats | f
     jsInit +
     `let i=window.i18n.${cat}={};` +
     [...translations]
-      .filter(([k, _]) => uniqueUsedKeys.includes(cat + '.' + k)) 
+      .filter(([k, _]) => keysForJavascripts.includes(cat + '.' + k)) 
       .map(
         ([k, v]) =>
           `i['${k}']=` +
