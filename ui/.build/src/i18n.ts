@@ -52,7 +52,7 @@ async function compileTypings(): Promise<void> {
   const [tstat, catStats] = await Promise.all([
     fs.promises.stat(typingsPathname).catch(() => undefined),
     Promise.all(cats.map(cat => updated(cat))),
-    fs.promises.mkdir(env.i18nJsDir).catch(() => {}),
+    fs.promises.mkdir(env.i18nJsDir).catch(() => { }),
   ]);
 
   if (!tstat || catStats.some(x => x)) {
@@ -67,23 +67,23 @@ async function compileTypings(): Promise<void> {
     await fs.promises.writeFile(
       typingsPathname,
       tsPrelude +
-        [...dicts]
-          .map(
-            ([cat, dict]) =>
-              `  ${cat}: {\n` +
-              [...dict.entries()]
-                .map(([k, v]) => {
-                  if (!/^[A-Za-z_]\w*$/.test(k)) k = `'${k}'`;
-                  const tpe =
-                    typeof v !== 'string' ? 'I18nPlural' : formatStringRe.test(v) ? 'I18nFormat' : 'string';
-                  const comment = typeof v === 'string' ? v.split('\n')[0] : v['other']?.split('\n')[0];
-                  return `    /** ${comment} */\n    ${k}: ${tpe};`;
-                })
-                .join('\n') +
-              '\n  };\n',
-          )
-          .join('') +
-        '}\n',
+      [...dicts]
+        .map(
+          ([cat, dict]) =>
+            `  ${cat}: {\n` +
+            [...dict.entries()]
+              .map(([k, v]) => {
+                if (!/^[A-Za-z_]\w*$/.test(k)) k = `'${k}'`;
+                const tpe =
+                  typeof v !== 'string' ? 'I18nPlural' : formatStringRe.test(v) ? 'I18nFormat' : 'string';
+                const comment = typeof v === 'string' ? v.split('\n')[0] : v['other']?.split('\n')[0];
+                return `    /** ${comment} */\n    ${k}: ${tpe};`;
+              })
+              .join('\n') +
+            '\n  };\n',
+        )
+        .join('') +
+      '}\n',
     );
     const histat = catStats.reduce((a, b) => (a && b && a.mtimeMs - b.mtimeMs > 2 ? a : b), tstat || false);
     if (histat) await fs.promises.utimes(typingsPathname, histat.mtime, histat.mtime);
@@ -146,9 +146,9 @@ async function writeJavascript(cat: string, locale?: string, xstat: fs.Stats | f
 
   const localeSpecific = locale
     ? await fs.promises
-        .readFile(join(env.i18nDestDir, cat, `${locale}.xml`), 'utf-8')
-        .catch(() => '')
-        .then(parseXml)
+      .readFile(join(env.i18nDestDir, cat, `${locale}.xml`), 'utf-8')
+      .catch(() => '')
+      .then(parseXml)
     : new Map<String, String | Plural>();
 
   const translations = new Map([...dicts.get(cat)!, ...localeSpecific]);
@@ -157,16 +157,19 @@ async function writeJavascript(cat: string, locale?: string, xstat: fs.Stats | f
     cat !== 'site'
       ? ''
       : siteInit +
-        'window.i18n.quantity=' +
-        (jsQuantity.find(({ l }) => l.includes(lang ?? ''))?.q ?? `o=>o==1?'one':'other'`) +
-        ';';
+      'window.i18n.quantity=' +
+      (jsQuantity.find(({ l }) => l.includes(lang ?? ''))?.q ?? `o=>o==1?'one':'other'`) +
+      ';';
   if (!jsInit && locale && !localeSpecific.size) return;
+
+  const filteredTranslations = env.i18nJsPruning ? [...translations]
+    .filter(([k, _]) => keysForJavascripts.includes(cat + '.' + k)) : translations
+
   const code =
     jsPrelude +
     jsInit +
     `let i=window.i18n.${cat}={};` +
-    [...translations]
-      .filter(([k, _]) => keysForJavascripts.includes(cat + '.' + k)) 
+    [...filteredTranslations]
       .map(
         ([k, v]) =>
           `i['${k}']=` +
