@@ -45,6 +45,7 @@ Options:
   --no-time           don't log the time
   --no-context        don't log the context
   --no-corepack       don't use corepack to install pnpm (protect or restricted system node installs)
+  --no-i18n-pruning   don't remove unused keys from javascript translation files
 
 Exclusive Options:    (any of these will disable other functions)
   --tsc               run tsc on {package}/tsconfig.json and dependencies
@@ -96,7 +97,7 @@ if (['--tsc', '--sass', '--esbuild', '--i18n'].filter(x => argv.includes(x)).len
 env.logTime = !argv.includes('--no-time');
 env.logCtx = !argv.includes('--no-context');
 env.logColor = !argv.includes('--no-color');
-env.i18nJsPruning = !argv.includes('--no-i18n-js-pruning');
+env.i18nJsPruning = !argv.includes('--no-i18n-pruning');
 env.watch = argv.includes('--watch') || oneDashArgs.includes('w');
 env.prod = argv.includes('--prod') || oneDashArgs.includes('p');
 env.debug = argv.includes('--debug') || oneDashArgs.includes('d');
