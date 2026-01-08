@@ -93,8 +93,7 @@ export default async function (
       pointRadius[colorName].push(0);
     }
 
-    const seconds = (centis / 100).toFixed(centis >= 200 ? 1 : 2);
-    label += '\n' + i18n.site.nbSeconds(Number(seconds));
+    label += '\n' + renderTimeSpent(centis);
     moveSeries[colorName].push(movePoint);
 
     let clock = node ? node.clock : undefined;
@@ -212,6 +211,11 @@ export default async function (
   pubsub.on('ply', movetimeChart.selectPly);
   pubsub.emit('ply.trigger');
   return movetimeChart;
+}
+
+export function renderTimeSpent(centis: number): string {
+  const seconds = (centis / 100).toFixed(centis >= 200 ? 1 : 2);
+  return i18n.site.nbSeconds(Number(seconds));
 }
 
 const addGameDuration = (el: HTMLCanvasElement, moveCentis: number[]) => {

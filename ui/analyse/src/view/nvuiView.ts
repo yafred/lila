@@ -51,6 +51,7 @@ import { playersView } from '../study/relay/relayPlayers';
 import { showInfo as tourOverview } from '../study/relay/relayTourView';
 import type { AnalyseNvuiContext } from '../analyse.nvui';
 import { scanDirectionsHandler } from 'lib/nvui/directionScan';
+import { renderTimeSpent } from 'chart/movetime';
 
 const throttled = (sound: string) => throttle(100, () => site.sound.play(sound));
 const selectSound = throttled('select');
@@ -328,10 +329,21 @@ function renderAriaResult(ctrl: AnalyseCtrl): VNode[] {
 }
 
 function renderCurrentLine({ ctrl, moveStyle }: AnalyseNvuiContext) {
-  if (ctrl.path.length === 0) return renderMainline(ctrl.mainline, ctrl.path, moveStyle.get(), !ctrl.retro && ctrl.showFishnetAnalysis());
+  if (ctrl.path.length === 0)
+    return renderMainline(
+      ctrl.mainline,
+      ctrl.path,
+      moveStyle.get(),
+      !ctrl.retro && ctrl.showFishnetAnalysis(),
+    );
   else {
     const futureNodes = ctrl.node.children.length > 0 ? ops.mainlineNodeList(ctrl.node.children[0]) : [];
-    return renderMainline(ctrl.nodeList.concat(futureNodes), ctrl.path, moveStyle.get(), !ctrl.retro  && ctrl.showFishnetAnalysis());
+    return renderMainline(
+      ctrl.nodeList.concat(futureNodes),
+      ctrl.path,
+      moveStyle.get(),
+      !ctrl.retro && ctrl.showFishnetAnalysis(),
+    );
   }
 }
 
@@ -536,6 +548,10 @@ export function renderCurrentNode({
     renderSan(node.san, node.uci, moveStyle.get()),
     renderLineIndex(ctrl),
     !ctrl.retro && ctrl.showFishnetAnalysis() && renderComments(node, moveStyle.get()),
+    node.eval ? `(${renderEval(node.eval.cp ?? 0)})` : undefined,
+    ctrl.data.game.moveCentis && ctrl.data.game.moveCentis[node.ply - 1]
+      ? `(${renderTimeSpent(ctrl.data.game.moveCentis[node.ply - 1])})`
+      : undefined,
   ]
     .filter(x => x)
     .join(' ')
