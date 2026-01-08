@@ -328,10 +328,10 @@ function renderAriaResult(ctrl: AnalyseCtrl): VNode[] {
 }
 
 function renderCurrentLine({ ctrl, moveStyle }: AnalyseNvuiContext) {
-  if (ctrl.path.length === 0) return renderMainline(ctrl.mainline, ctrl.path, moveStyle.get(), !ctrl.retro);
+  if (ctrl.path.length === 0) return renderMainline(ctrl.mainline, ctrl.path, moveStyle.get(), !ctrl.retro && ctrl.showFishnetAnalysis());
   else {
     const futureNodes = ctrl.node.children.length > 0 ? ops.mainlineNodeList(ctrl.node.children[0]) : [];
-    return renderMainline(ctrl.nodeList.concat(futureNodes), ctrl.path, moveStyle.get(), !ctrl.retro);
+    return renderMainline(ctrl.nodeList.concat(futureNodes), ctrl.path, moveStyle.get(), !ctrl.retro  && ctrl.showFishnetAnalysis());
   }
 }
 
@@ -535,7 +535,7 @@ export function renderCurrentNode({
     node.ply % 2 === 1 ? i18n.site.white : i18n.site.black,
     renderSan(node.san, node.uci, moveStyle.get()),
     renderLineIndex(ctrl),
-    !ctrl.retro && renderComments(node, moveStyle.get()),
+    !ctrl.retro && ctrl.showFishnetAnalysis() && renderComments(node, moveStyle.get()),
   ]
     .filter(x => x)
     .join(' ')
