@@ -77,7 +77,9 @@ function openModalWithSettings(settingId: number, ctrl: LobbyController) {
   if (setting) {
     const storeKey = ctrl.setupCtrl.storeKey(setting.gameType);
     storage.set(storeKey, JSON.stringify(setting.settings));
-    ctrl.setupCtrl.openModal(setting.gameType);
-    ctrl.redraw();
+    ctrl.setupCtrl.saveToStore = false;
+    ctrl.setupCtrl.gameType = setting.gameType;
+    ctrl.setupCtrl.loadPropsFromStore();
+    ctrl.setupCtrl.submit();
   }
 }
