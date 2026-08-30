@@ -33,6 +33,9 @@ importers:
       ab:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d
+      chessground3D:
+        specifier: link:/home/fred/github/chess3D/src/chessground3D
+        version: link:../chess3D/src/chessground3D
       chessops:
         specifier: ^0.15.1
         version: 0.15.1

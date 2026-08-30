@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@lichess-org/chessground": "^10.1.1",
+    "chessground3D": "link:/home/fred/github/chess3D/src/chessground3D",
     "@lichess-org/pgn-viewer": "^2.6.4",
     "@playwright/test": "^1.63.0",
     "@types/lichess": "workspace:*",
