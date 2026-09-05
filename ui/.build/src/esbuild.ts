@@ -20,7 +20,7 @@ export async function esbuild(): Promise<[string, string] | undefined> {
     splitting: true,
     format: 'esm',
     target: 'es2018',
-    supported: { bigint: true },
+    supported: { bigint: true, 'import-meta': true },
     logLevel: 'silent',
     sourcemap: !env.prod,
     minify: env.prod,
