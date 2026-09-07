@@ -33,6 +33,7 @@ logs/
 /public/npm/
 /public/css/
 /public/json/
+/public/scene.glb
 target/
 /data/
 dist/
