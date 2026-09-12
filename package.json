@@ -8,12 +8,12 @@
   },
   "devDependencies": {
     "@lichess-org/chessground": "^10.1.1",
-    "chessground3D": "link:/home/fred/github/chess3D/src/chessground3D",
     "@lichess-org/pgn-viewer": "^2.6.4",
     "@playwright/test": "^1.63.0",
     "@types/lichess": "workspace:*",
     "@types/node": "^24.13.3",
     "ab": "github:lichess-org/ab-stub",
+    "chessground3D": "github:yafred/chessground3D",
     "chessops": "^0.15.1",
     "jsdom": "^30.0.1",
     "lint-staged": "^17.5.0",
